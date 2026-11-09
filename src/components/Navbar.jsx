@@ -1,4 +1,5 @@
-import { Link, NavLink } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 
 const links = [
   { to: '/', label: 'Home', end: true },
@@ -6,27 +7,51 @@ const links = [
 ]
 
 const focusRing =
-  'outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2'
+  'outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent'
 
 export default function Navbar() {
+  const { pathname } = useLocation()
+  const isHome = pathname === '/'
+  const [scrolled, setScrolled] = useState(false)
+
+  // On the home page the bar is transparent over the hero, then turns dark once you scroll
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  const solid = !isHome || scrolled
+
   return (
-    <header className="sticky top-0 z-50 border-b border-neutral-200/80 bg-white/80 backdrop-blur-md">
+    <header
+      className={[
+        'z-50 w-full border-b transition-colors duration-300',
+        isHome ? 'fixed inset-x-0 top-0' : 'sticky top-0',
+        solid
+          ? 'border-white/10 bg-neutral-950/85 backdrop-blur-md'
+          : 'border-transparent bg-transparent',
+      ].join(' ')}
+    >
       <nav
         aria-label="Main"
-        className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6"
+        className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8"
       >
         <Link
           to="/"
-          className={`flex items-center gap-2 rounded-md text-xl font-semibold tracking-tight text-neutral-900 ${focusRing}`}
+          className={`flex items-center gap-2.5 rounded-md text-xl font-light tracking-[0.18em] text-white ${focusRing}`}
         >
           <span
             aria-hidden="true"
-            className="h-2.5 w-2.5 rounded-full bg-neutral-900"
-          />
-          Lumen
+            className="flex h-5 w-5 items-center justify-center rounded-full border border-white"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-white" />
+          </span>
+          LUMEN
         </Link>
 
-        <ul className="flex items-center gap-1 rounded-full bg-neutral-100 p-1">
+        <ul className="flex items-center gap-5 sm:gap-8">
           {links.map(({ to, label, end }) => (
             <li key={to}>
               <NavLink
@@ -34,11 +59,11 @@ export default function Navbar() {
                 end={end}
                 className={({ isActive }) =>
                   [
-                    'block rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-200',
+                    'block rounded-sm border-b py-1 text-sm font-light tracking-wide transition-colors duration-200',
                     focusRing,
                     isActive
-                      ? 'bg-white text-neutral-900 shadow-sm ring-1 ring-neutral-200'
-                      : 'text-neutral-500 hover:text-neutral-900',
+                      ? 'border-white text-white'
+                      : 'border-transparent text-white/70 hover:text-white',
                   ].join(' ')
                 }
               >

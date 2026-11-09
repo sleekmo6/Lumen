@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import StayCard from '../components/StayCard.jsx'
 import { listings } from '../data/listings.js'
 
@@ -16,7 +17,9 @@ const BED_OPTIONS = [
 ]
 
 export default function Explore() {
-  const [query, setQuery] = useState('')
+  const [searchParams] = useSearchParams()
+  // Seeded from the Home search (?q=...), editable afterwards
+  const [query, setQuery] = useState(searchParams.get('q') ?? '')
   const [maxPrice, setMaxPrice] = useState(PRICE_MAX)
   const [minBeds, setMinBeds] = useState(0)
 
