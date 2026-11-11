@@ -4,6 +4,7 @@ import Navbar from './components/Navbar.jsx'
 import Home from './pages/Home.jsx'
 import Explore from './pages/Explore.jsx'
 import StayDetail from './pages/StayDetail.jsx'
+import Contact from './pages/Contact.jsx'
 
 // Lazy-loaded so three.js stays out of the main bundle until a tour is opened
 const Tour3D = lazy(() => import('./pages/Tour3D.jsx'))
@@ -27,6 +28,7 @@ export default function App() {
             <Route path="/explore" element={<Explore />} />
             <Route path="/stay/:id" element={<StayDetail />} />
             <Route path="/tour/:id" element={<Tour3D />} />
+            <Route path="/contact" element={<Contact />} />
           </Routes>
         </Suspense>
       </main>
