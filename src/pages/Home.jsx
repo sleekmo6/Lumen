@@ -7,13 +7,36 @@ import { listings } from '../data/listings.js'
 const HERO_IMAGE =
   'https://images.unsplash.com/photo-1782392230060-be8a3984a58c?auto=format&fit=crop&w=2400&q=80'
 
-// Dark gradient so white text stays readable on any photo
+// Keeps the top readable under the nav and the middle photo-forward
 const HERO_OVERLAY =
-  'linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.78) 100%)'
+  'linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.25) 40%, rgba(0,0,0,0.3) 100%)'
 
-const labelClass = 'mb-3 block text-xs font-normal uppercase tracking-[0.12em] text-white/90'
+// Fades the bottom of the hero into the Featured section (same colour, no hard line)
+const HERO_FADE =
+  'linear-gradient(to bottom, rgba(34,40,42,0) 0%, rgba(34,40,42,0.65) 55%, #22282a 100%)'
+
+const labelClass =
+  'mb-2 block text-xs font-normal uppercase tracking-[0.12em] text-white/90 sm:mb-3'
 const fieldClass =
-  'w-full rounded-full border border-white/50 bg-white/5 px-5 py-3 text-sm font-light text-white placeholder-white/70 backdrop-blur-sm outline-none transition focus:border-white focus:bg-white/10 [color-scheme:dark]'
+  'w-full min-w-0 rounded-full border border-white/50 bg-white/5 px-4 py-3 text-sm font-light text-white placeholder-white/70 backdrop-blur-sm outline-none transition focus:border-white focus:bg-white/10 sm:px-5 [color-scheme:dark]'
+
+const whyLumen = [
+  {
+    icon: '◎',
+    title: 'Walk the space before you book',
+    text: 'Step inside select homes with an interactive 3D tour, so there are no surprises on arrival.',
+  },
+  {
+    icon: '⌂',
+    title: 'Lagos-first, curated stays',
+    text: 'We start in Lagos and add hand-picked homes elsewhere. Fewer listings, better ones.',
+  },
+  {
+    icon: '✦',
+    title: 'Unique homes, not a generic marketplace',
+    text: 'Lofts, villas, machiya and studios with character, chosen for the space and the neighborhood.',
+  },
+]
 
 function XIcon() {
   return (
@@ -38,23 +61,31 @@ export default function Home() {
   const [checkout, setCheckout] = useState('')
   const [guests, setGuests] = useState('')
 
-  const handleSearch = (e) => {
-    e.preventDefault()
-    // "Where" seeds the Explore search. Dates and guests are visual-only for now.
-    const q = where.trim()
-    navigate({
-      pathname: '/explore',
-      search: q ? `?q=${encodeURIComponent(q)}` : '',
-    })
-  }
-
   const scrollToStays = () =>
     document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })
+
+  const handleSearch = (e) => {
+    e.preventDefault()
+
+    const params = new URLSearchParams()
+    if (where.trim()) params.set('q', where.trim())
+    if (arrival) params.set('from', arrival)
+    if (checkout) params.set('to', checkout)
+    if (guests) params.set('guests', guests)
+
+    const qs = params.toString()
+    if (!qs) {
+      // Nothing entered: just show the featured stays
+      scrollToStays()
+      return
+    }
+    navigate({ pathname: '/explore', search: `?${qs}` })
+  }
 
   return (
     <div>
       {/* Hero */}
-      <section className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-neutral-900">
+      <section className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-lumen-deep">
         <img
           src={HERO_IMAGE}
           alt=""
@@ -66,19 +97,25 @@ export default function Home() {
           className="absolute inset-0"
           style={{ backgroundImage: HERO_OVERLAY }}
         />
+        {/* Seamless blend into the next section */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 bottom-0 h-64"
+          style={{ backgroundImage: HERO_FADE }}
+        />
 
         <div className="relative z-10 w-full max-w-5xl px-5 pb-28 pt-28 sm:px-8">
           <h1 className="mx-auto max-w-3xl text-center text-4xl font-light leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
             Book unique accommodation and impressions
           </h1>
 
-          <div className="mt-10 h-px w-full bg-white/50" />
+          <div className="mt-8 h-px w-full bg-white/50 sm:mt-10" />
 
           <form
             onSubmit={handleSearch}
-            className="mt-12 grid grid-cols-1 items-end gap-4 sm:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,1fr))_auto]"
+            className="mt-8 grid grid-cols-2 items-end gap-x-3 gap-y-4 sm:mt-12 lg:grid-cols-[repeat(4,minmax(0,1fr))_auto] lg:gap-x-4"
           >
-            <div>
+            <div className="col-span-2 lg:col-span-1">
               <label htmlFor="where" className={labelClass}>
                 Where
               </label>
@@ -123,7 +160,7 @@ export default function Home() {
               />
             </div>
 
-            <div>
+            <div className="col-span-2 lg:col-span-1">
               <label htmlFor="guests" className={labelClass}>
                 Guests
               </label>
@@ -158,7 +195,7 @@ export default function Home() {
 
             <button
               type="submit"
-              className="w-full rounded-full bg-white px-8 py-3 text-sm font-medium text-neutral-900 transition hover:bg-neutral-200 sm:col-span-2 lg:col-span-1 lg:w-auto"
+              className="col-span-2 w-full rounded-full bg-white px-8 py-3 text-sm font-medium text-neutral-900 transition hover:bg-neutral-200 lg:col-span-1 lg:w-auto"
             >
               Start Search
             </button>
@@ -202,8 +239,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured stays */}
-      <section id="featured" className="bg-neutral-950 px-4 py-20 text-white sm:px-6">
+      {/* Featured stays + Why Lumen (continues the hero's fade colour) */}
+      <section id="featured" className="surface-page -mt-px px-4 pb-24 pt-8 text-white sm:px-6">
         <div className="mx-auto max-w-6xl">
           <div className="mb-8 flex items-end justify-between gap-4">
             <div>
@@ -222,8 +259,34 @@ export default function Home() {
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {listings.map((stay) => (
-              <StayCard key={stay.id} stay={stay} />
+              <div key={stay.id} className="reveal">
+                <StayCard stay={stay} />
+              </div>
             ))}
+          </div>
+
+          {/* Why Lumen */}
+          <div className="mt-20 border-t border-white/10 pt-14">
+            <p className="text-xs font-normal uppercase tracking-[0.2em] text-white/50">
+              Why Lumen
+            </p>
+            <div className="mt-8 grid gap-6 md:grid-cols-3">
+              {whyLumen.map(({ icon, title, text }) => (
+                <div
+                  key={title}
+                  className="reveal rounded-2xl border border-white/10 bg-white/[0.03] p-6"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-lg text-white/90"
+                  >
+                    {icon}
+                  </span>
+                  <h3 className="mt-5 text-lg font-light tracking-tight">{title}</h3>
+                  <p className="mt-2 text-sm font-light leading-relaxed text-white/60">{text}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

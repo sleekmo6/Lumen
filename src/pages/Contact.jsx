@@ -26,7 +26,7 @@ export default function Contact() {
   }
 
   return (
-    <div className="min-h-[calc(100dvh-4rem)] bg-gradient-to-b from-neutral-950 via-neutral-900 to-stone-900 px-4 py-16 text-white sm:px-6 sm:py-24">
+    <div className="min-h-[calc(100dvh-4rem)] surface-page px-4 py-16 text-white sm:px-6 sm:py-24">
       <div className="mx-auto max-w-xl">
         <p className="text-xs font-normal uppercase tracking-[0.2em] text-white/50">Contact</p>
         <h1 className="mt-3 text-3xl font-light tracking-tight sm:text-5xl">Let’s talk</h1>
