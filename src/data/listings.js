@@ -29,8 +29,37 @@ export const listings = [
       name: 'Adaeze',
       avatarUrl: avatar('photo-1494790108377-be9c29b29330'),
     },
+    area:
+      'Victoria Island is Lagos at its most polished: waterfront promenades, galleries, rooftop bars and some of the city’s best dining within minutes. Traffic can be heavy at rush hour, so a short ride often beats a long walk.',
     tour3d: true,
     modelPath: '/models/apartment.glb',
+  },
+  {
+    id: 'lekki-waterfront',
+    title: 'Lagoon-View Apartment in Lekki',
+    location: 'Lagos, Nigeria',
+    pricePerNight: 85,
+    rating: 4.86,
+    reviewCount: 74,
+    beds: 2,
+    baths: 2,
+    guests: 4,
+    tags: ['Lagoon views', 'Pool', 'Gated'],
+    images: [
+      img('photo-1600607687939-ce8a6c25118c'),
+      img('photo-1600566753190-17f0baa2a6c3'),
+      img('photo-1560185007-cde436f6a4d0'),
+    ],
+    description:
+      'A calm two-bedroom apartment overlooking the lagoon, in a gated estate with a pool and round-the-clock security. Cafés, beach spots and markets are a short drive away. Ideal for longer stays and remote work.',
+    amenities: ['Fast Wi-Fi', 'Pool', 'Backup power', 'Air conditioning', 'Full kitchen', 'Secure parking'],
+    host: {
+      name: 'Tunde',
+      avatarUrl: avatar('photo-1472099645785-5658abf4ff4e'),
+    },
+    area:
+      'Lekki’s lagoon side is calmer and greener than the mainland, with beach clubs, markets and weekend art spots nearby. It’s a popular base for remote work and longer stays.',
+    tour3d: false,
   },
   {
     id: 'lisbon-terrace',
@@ -55,13 +84,15 @@ export const listings = [
       name: 'Miguel',
       avatarUrl: avatar('photo-1507003211169-0a1dd7228f2d'),
     },
+    area:
+      'Alfama is Lisbon’s oldest quarter, a maze of steep lanes, viewpoints and fado bars. Comfortable shoes help, as there are lots of stairs.',
     tour3d: false,
   },
   {
     id: 'kyoto-machiya',
     title: 'Quiet Machiya near Gion',
     location: 'Kyoto, Japan',
-    pricePerNight: 180,
+    pricePerNight: 165,
     rating: 4.97,
     reviewCount: 89,
     beds: 3,
@@ -81,6 +112,8 @@ export const listings = [
       name: 'Haruka',
       avatarUrl: avatar('photo-1438761681033-6461ffad8d80'),
     },
+    area:
+      'Gion is known for teahouses, lantern-lit lanes and nearby temples. Early mornings are the quietest time to wander.',
     tour3d: false,
   },
   {
@@ -108,6 +141,8 @@ export const listings = [
       name: 'Thabo',
       avatarUrl: avatar('photo-1500648767791-00dcc994a43e'),
     },
+    area:
+      'The hillside gives you bay views and fresh mountain air, with beaches, wine estates and hiking trails a short drive away. A car makes everything easier.',
     tour3d: false,
   },
   {
@@ -133,6 +168,8 @@ export const listings = [
       name: 'Valeria',
       avatarUrl: avatar('photo-1544005313-94ddf0286df2'),
     },
+    area:
+      'Roma Norte is a leafy neighborhood of cafés, bookshops and Art Deco facades, easy to explore entirely on foot.',
     tour3d: false,
   },
 ]

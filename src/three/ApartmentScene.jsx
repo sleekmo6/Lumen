@@ -1,7 +1,7 @@
-import { Component, Suspense, useMemo } from 'react'
+import { Component, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import * as THREE from 'three'
 import { Canvas } from '@react-three/fiber'
-import { Environment, Html, OrbitControls, useGLTF } from '@react-three/drei'
+import { Environment, OrbitControls, useGLTF } from '@react-three/drei'
 
 const DEFAULT_MODEL_PATH = '/models/apartment.glb'
 
@@ -12,7 +12,7 @@ const TARGET_SIZE = 8
 // Cap pixel ratio at 2 to keep high-DPI phones/laptops fast.
 const DPR = Math.min(typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1, 2)
 
-function Model({ path }) {
+function Model({ path, onReady }) {
   const { scene } = useGLTF(path)
 
   // Measure the model once, then derive a uniform scale and a centering offset.
@@ -29,22 +29,17 @@ function Model({ path }) {
     }
   }, [scene])
 
+  // This only runs once the model (and environment) have finished loading
+  useEffect(() => {
+    onReady()
+  }, [onReady])
+
   return (
     <group scale={scale}>
       <group position={offset}>
         <primitive object={scene} />
       </group>
     </group>
-  )
-}
-
-function Loader() {
-  return (
-    <Html center>
-      <span className="whitespace-nowrap rounded-full bg-white/90 px-4 py-2 text-sm font-medium text-neutral-700 shadow">
-        Loading 3D tour…
-      </span>
-    </Html>
   )
 }
 
@@ -58,8 +53,11 @@ class SceneErrorBoundary extends Component {
   render() {
     if (this.state.failed) {
       return (
-        <div className="flex h-full w-full items-center justify-center px-4 text-center text-sm text-neutral-600">
-          Couldn’t load the 3D model. Please try again later.
+        <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-lumen-deep px-6 text-center text-white">
+          <p className="text-lg font-light">This 3D tour isn’t available right now.</p>
+          <p className="text-sm font-light text-white/60">
+            The model couldn’t be loaded. Please try again later.
+          </p>
         </div>
       )
     }
@@ -68,35 +66,59 @@ class SceneErrorBoundary extends Component {
 }
 
 export default function ApartmentScene({ modelPath = DEFAULT_MODEL_PATH }) {
+  const [ready, setReady] = useState(false)
+  const markReady = useCallback(() => setReady(true), [])
+
   return (
     <SceneErrorBoundary>
-      <Canvas
-        dpr={DPR}
-        camera={{ position: [7, 5, 9], fov: 50, near: 0.1, far: 100 }}
-        className="h-full w-full"
-      >
-        <color attach="background" args={['#f5f5f5']} />
+      <div className="relative h-full w-full bg-lumen-deep">
+        <Canvas
+          dpr={DPR}
+          camera={{ position: [7, 5, 9], fov: 50, near: 0.1, far: 100 }}
+          className="h-full w-full"
+        >
+          <color attach="background" args={['#1d2325']} />
 
-        {/* Soft fill + one directional light; the Environment adds realistic reflections */}
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[5, 8, 5]} intensity={1.2} />
+          {/* Soft fill + one directional light; the Environment adds realistic reflections */}
+          <ambientLight intensity={0.5} />
+          <directionalLight position={[5, 8, 5]} intensity={1.2} />
 
-        <Suspense fallback={<Loader />}>
-          <Model path={modelPath} />
-          {/* "apartment" is a built-in drei preset; swap for "city" if you prefer */}
-          <Environment preset="apartment" />
-        </Suspense>
+          <Suspense fallback={null}>
+            <Model path={modelPath} onReady={markReady} />
+            {/* "apartment" is a built-in drei preset; swap for "city" if you prefer */}
+            <Environment preset="apartment" />
+          </Suspense>
 
-        <OrbitControls
-          makeDefault
-          enableDamping
-          dampingFactor={0.08}
-          enablePan={false}
-          minDistance={3} // closest zoom (model is ~8 units wide)
-          maxDistance={20} // farthest zoom
-          maxPolarAngle={Math.PI / 2} // don't orbit below the floor
-        />
-      </Canvas>
+          <OrbitControls
+            makeDefault
+            enableDamping
+            dampingFactor={0.08}
+            enablePan={false}
+            minDistance={3} // closest zoom (model is ~8 units wide)
+            maxDistance={20} // farthest zoom
+            maxPolarAngle={Math.PI / 2} // don't orbit below the floor
+          />
+        </Canvas>
+
+        {/* Dark skeleton + message while the model loads; fades away when ready */}
+        <div
+          aria-hidden={ready}
+          className={[
+            'absolute inset-0 z-10 flex flex-col items-center justify-center gap-5 bg-lumen-deep text-white transition-opacity duration-700',
+            ready ? 'pointer-events-none opacity-0' : 'opacity-100',
+          ].join(' ')}
+        >
+          <div className="grid w-64 grid-cols-3 gap-2" aria-hidden="true">
+            <div className="col-span-3 h-24 animate-pulse rounded-2xl bg-white/10" />
+            <div className="h-12 animate-pulse rounded-xl bg-white/10" />
+            <div className="h-12 animate-pulse rounded-xl bg-white/[0.07]" />
+            <div className="h-12 animate-pulse rounded-xl bg-white/10" />
+          </div>
+          <p role="status" className="text-sm font-light tracking-wide text-white/70">
+            Loading the space…
+          </p>
+        </div>
+      </div>
     </SceneErrorBoundary>
   )
 }
